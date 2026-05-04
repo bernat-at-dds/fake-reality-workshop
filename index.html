@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can you fake reality? — Workshop · Domestic Data Streamers</title>
+<meta name="description" content="A workshop on disinformation. By Pau Aleikum and Bernat Saiz · Domestic Data Streamers.">
+<style>
+  /* ─────────────────────────────────────────────────────────
+     FONTS
+     ───────────────────────────────────────────────────────── */
+  @font-face {
+    font-family: 'Roobert';
+    src: url('https://cdn.domesticstreamers.com/strapi-uploads/assets/Roobert_Regular_30a455f5c5.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roobert';
+    src: url('https://cdn.domesticstreamers.com/strapi-uploads/assets/Roobert_Medium_1d4fba33ea.woff2') format('woff2');
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roobert';
+    src: url('https://cdn.domesticstreamers.com/strapi-uploads/assets/Roobert_SemiBold_b27e0fa422.woff2') format('woff2');
+    font-weight: 600; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Roobert';
+    src: url('https://cdn.domesticstreamers.com/strapi-uploads/assets/Roobert_Bold_e265fa498c.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     TOKENS
+     ───────────────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #FAFAF7;
+    --paper: #F5F4ED;
+    --yellow: #FFEC42;
+    --red: #E63946;
+    --blue: #2563EB;
+    --green: #16A34A;
+    --orange: #EA580C;
+    --grey-100: #EDEBE3;
+    --grey-200: #DAD7CB;
+    --grey-300: #BFBCAE;
+    --grey-500: #88857A;
+    --grey-700: #4A4842;
+    --font-sans: 'Roobert', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --pad-x: 80px;
+    --pad-y-top: 64px;
+    --pad-y-bot: 64px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--black);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.4;
+    overscroll-behavior: none;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     STAGE / SLIDES (no top nav menu — feedback)
+     ───────────────────────────────────────────────────────── */
+  .stage {
+    position: relative;
+    width: 100%; height: 100vh;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: var(--pad-y-top) var(--pad-x) var(--pad-y-bot);
+    background: var(--paper);
+    color: var(--black);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide.bg-white { background: var(--white); }
+  .slide.bg-black { background: var(--black); color: var(--white); }
+  .slide.bg-yellow { background: var(--yellow); color: var(--black); }
+
+  /* ─────────────────────────────────────────────────────────
+     UNIFIED TYPOGRAPHY · headers consistent across slides
+     ───────────────────────────────────────────────────────── */
+  .slide-title {
+    font-size: 64px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    margin: 0 0 28px 0;
+    color: inherit;
+  }
+  .slide-title.medium { font-size: 56px; }
+  .slide-title.large { font-size: 96px; line-height: 0.96; letter-spacing: -0.035em; }
+  .slide-subtitle {
+    font-size: 36px;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    color: rgba(10,10,10,0.7);
+    margin: -16px 0 32px 0;
+    max-width: 1300px;
+  }
+  .slide.bg-black .slide-subtitle { color: rgba(250,250,247,0.78); }
+  .slide.bg-yellow .slide-subtitle { color: rgba(10,10,10,0.78); }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 1 — Title (animated background)
+     ─────────────────────────────────────────────────────────
+     • Big title left-anchored
+     • Pau and Bernat names: bottom LEFT
+     • DDS logo: bottom RIGHT
+     • Animated subtle gradient + drifting abstract lines
+     ───────────────────────────────────────────────────────── */
+  .title-slide,
+  .closing-slide {
+    background: var(--black);
+    color: var(--white);
+    overflow: hidden;
+    padding: 64px 80px;
+    justify-content: space-between;
+  }
+  .animated-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .animated-bg::before {
+    content: "";
+    position: absolute;
+    inset: -25%;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(255, 236, 66, 0.18) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 70%, rgba(37, 99, 235, 0.18) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(230, 57, 70, 0.10) 0%, transparent 60%);
+    filter: blur(40px);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(4%, -3%) scale(1.05); }
+    100% { transform: translate(-3%, 4%) scale(0.97); }
+  }
+  .animated-bg svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .animated-bg .line {
+    fill: none;
+    stroke: rgba(250, 250, 247, 0.12);
+    stroke-width: 1;
+  }
+  .animated-bg .line.accent { stroke: rgba(255, 236, 66, 0.18); stroke-width: 1.5; }
+  .animated-bg .line.l1 { animation: drift-line-a 18s ease-in-out infinite alternate; }
+  .animated-bg .line.l2 { animation: drift-line-b 24s ease-in-out infinite alternate; }
+  .animated-bg .line.l3 { animation: drift-line-c 28s ease-in-out infinite alternate; }
+  .animated-bg .line.l4 { animation: drift-line-d 20s ease-in-out infinite alternate; }
+  @keyframes drift-line-a { 0% { transform: translate(0,0); } 100% { transform: translate(40px,-30px); } }
+  @keyframes drift-line-b { 0% { transform: translate(0,0); } 100% { transform: translate(-30px,50px); } }
+  @keyframes drift-line-c { 0% { transform: translate(0,0); } 100% { transform: translate(50px,40px); } }
+  @keyframes drift-line-d { 0% { transform: translate(0,0); } 100% { transform: translate(-50px,-20px); } }
+
+  .title-slide > *,
+  .closing-slide > * { position: relative; z-index: 2; }
+
+  .title-eyebrow {
+    font-size: 14px; letter-spacing: 0.32em;
+    font-weight: 600; text-transform: uppercase;
+    color: var(--yellow);
+  }
+  .title-emoji {
+    font-size: 76px; line-height: 1;
+    margin: 36px 0 24px;
+  }
+  .title-main {
+    font-size: 168px; line-height: 0.92;
+    font-weight: 600; letter-spacing: -0.045em;
+    color: var(--white);
+    margin: 0;
+  }
+  .title-main em {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--yellow);
+  }
+  .title-meta {
+    font-size: 38px; letter-spacing: 0.02em;
+    font-weight: 500;
+    color: rgba(250,250,247,0.75);
+    margin-top: 36px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .title-bottom,
+  .closing-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(250, 250, 247, 0.16);
+  }
+  .title-names {
+    font-size: 24px;
+    color: var(--white);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .dds-logo {
+    width: 320px;
+    height: auto;
+    flex-shrink: 0;
+    fill: var(--white);
+    opacity: 0.92;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 2 — Schedule (taller blocks, bigger text)
+     ───────────────────────────────────────────────────────── */
+  .schema {
+    display: grid;
+    grid-template-columns: 30fr 60fr 10fr 25fr 40fr;
+    gap: 10px;
+    width: 100%;
+    flex: 1;
+    min-height: 460px;
+    margin-top: 8px;
+  }
+  .schema-block {
+    border-radius: 16px;
+    padding: 32px 30px;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid transparent;
+  }
+  .schema-block.intro { background: #E6F1FB; border-color: rgba(37,99,235,0.18); }
+  .schema-block.build { background: #EEEDFE; border-color: rgba(83,74,183,0.18); }
+  .schema-block.brk { background: var(--paper); border: 1px dashed var(--grey-300); }
+  .schema-block.detect { background: #FAECE7; border-color: rgba(230,57,70,0.2); }
+  .schema-block.reveal { background: #FFF8DA; border-color: rgba(176,122,14,0.22); }
+  .schema-name {
+    font-size: 36px; font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+  }
+  .schema-time {
+    font-size: 18px; font-weight: 500;
+    color: var(--grey-700);
+    font-variant-numeric: tabular-nums;
+  }
+  .schema-duration {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--grey-700);
+    margin-top: 6px;
+  }
+  .schema-rail {
+    display: flex; justify-content: space-between;
+    width: 100%;
+    margin-top: 16px;
+    padding: 0 12px;
+    font-size: 13px; font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--grey-700);
+    letter-spacing: 0.04em;
+  }
+
+  /* small narrow blocks (Break) need vertical text or smaller name */
+  .schema-block.brk .schema-name { font-size: 28px; }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 3 — Concept review (2x2 matrix, big labels)
+     ───────────────────────────────────────────────────────── */
+  .types-matrix {
+    display: grid;
+    grid-template-columns: 320px 1fr 1fr;
+    grid-template-rows: 90px 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    flex: 1;
+    min-height: 480px;
+  }
+  .tm-cell {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 32px;
+    border: 1px solid var(--grey-200);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .tm-cell.label {
+    background: transparent; border: none;
+    padding: 8px 16px;
+    font-size: 36px; letter-spacing: -0.015em;
+    text-transform: none; font-weight: 600;
+    color: var(--grey-700);
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+  .tm-cell.label.row {
+    justify-content: center;
+    padding-right: 32px;
+    text-align: right;
+    align-items: flex-end;
+    line-height: 1.05;
+    font-size: 36px;
+  }
+  .tm-cell.empty { background: transparent; border: none; }
+  .tm-cell .tm-name {
+    font-size: 44px; font-weight: 600;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+  }
+  .tm-cell .tm-name.muted { color: var(--grey-700); font-weight: 500; font-size: 32px; }
+  .tm-cell.dis {
+    background: var(--yellow);
+    border-color: rgba(10,10,10,0.18);
+  }
+  .today-pill {
+    display: inline-block;
+    background: var(--black); color: var(--yellow);
+    padding: 5px 14px; border-radius: 4px;
+    font-size: 13px; letter-spacing: 0.16em;
+    font-weight: 600; text-transform: uppercase;
+    margin-top: 16px;
+    align-self: flex-start;
+  }
+  .types-note {
+    font-size: 20px; line-height: 1.5;
+    color: rgba(10,10,10,0.78);
+    margin-top: 24px;
+    font-style: italic;
+  }
+  .types-note strong { font-style: normal; font-weight: 500; color: var(--black); }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 4 — Six manipulation techniques (with emoji)
+     ───────────────────────────────────────────────────────── */
+  .techniques {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 64px;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .technique {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .technique-emoji {
+    font-size: 60px;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 80px;
+  }
+  .technique-name {
+    font-size: 44px; font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    line-height: 1.05;
+  }
+  .technique-desc {
+    font-size: 24px; line-height: 1.4;
+    color: rgba(10,10,10,0.7);
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 5 — Divide in groups (yellow, individual letter boxes)
+     ───────────────────────────────────────────────────────── */
+  .group-letters {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin: 32px 0 32px;
+  }
+  .group-letter {
+    aspect-ratio: 1 / 1.1;
+    background: var(--black);
+    color: var(--yellow);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 88px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .group-instruction {
+    font-size: 28px; line-height: 1.4;
+    color: rgba(10,10,10,0.85);
+    max-width: 1200px;
+    font-weight: 500;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 6 — The master deck (iframe, big title)
+     ───────────────────────────────────────────────────────── */
+  .iframe-host {
+    flex: 1;
+    margin-top: 8px;
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--grey-200);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column;
+    min-height: 480px;
+  }
+  .iframe-bar {
+    background: var(--grey-100);
+    padding: 10px 14px;
+    display: flex; gap: 6px; align-items: center;
+    border-bottom: 1px solid var(--grey-200);
+    flex-shrink: 0;
+  }
+  .iframe-bar-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .iframe-bar-dot.r { background: #FF5F57; }
+  .iframe-bar-dot.y { background: #FEBC2E; }
+  .iframe-bar-dot.g { background: #27C840; }
+  .iframe-bar-url {
+    flex: 1;
+    background: var(--white);
+    border-radius: 5px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--grey-500);
+    font-family: var(--font-mono);
+    margin-left: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .iframe-host iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: var(--white);
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 7 — Who analyses who (radically simpler, big text)
+     ───────────────────────────────────────────────────────── */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 64px;
+    width: 100%;
+    flex: 1;
+    align-content: center;
+    margin-top: 8px;
+  }
+  .analysis-row-simple {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .analysis-row-simple .from {
+    background: var(--black);
+    color: var(--yellow);
+    width: 76px;
+    height: 76px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    letter-spacing: -0.04em;
+    flex-shrink: 0;
+  }
+  .analysis-row-simple .arrow {
+    color: var(--grey-700);
+    font-size: 32px;
+    font-weight: 400;
+  }
+  .analysis-row-simple .to {
+    display: flex;
+    gap: 10px;
+  }
+  .analysis-row-simple .to span {
+    background: var(--yellow);
+    color: var(--black);
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px;
+    letter-spacing: -0.04em;
+    flex-shrink: 0;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 8 — Inspect Element (HTML browser bar + SVG body)
+     ───────────────────────────────────────────────────────── */
+  .iframe-host > svg.mockup-body {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: var(--white);
+    min-height: 0;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     TIMER SLIDES (split layout · 2/3 content · 1/3 timer)
+     ───────────────────────────────────────────────────────── */
+  .timer-slide-split {
+    background: var(--black);
+    color: var(--white);
+    padding: 64px 80px;
+    transition: background 0.4s ease;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+    align-items: center;
+    justify-content: stretch;
+  }
+  .timer-slide-split.warning { background: var(--red); }
+  .timer-slide-split.done { background: var(--green); }
+
+  .timer-slide-content {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    min-width: 0;
+  }
+  .timer-phase {
+    font-family: var(--font-mono);
+    font-size: 13px; letter-spacing: 0.24em;
+    text-transform: uppercase; font-weight: 600;
+    color: var(--yellow);
+    margin-bottom: 18px;
+  }
+  .timer-slide-split.warning .timer-phase,
+  .timer-slide-split.done .timer-phase { color: var(--white); }
+
+  .timer-slide-title {
+    font-size: 64px; line-height: 1;
+    font-weight: 600; letter-spacing: -0.025em;
+    margin-bottom: 16px;
+    color: var(--white);
+  }
+  .timer-slide-subtitle {
+    font-size: 32px; line-height: 1.2;
+    font-weight: 400; letter-spacing: -0.012em;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 24px;
+  }
+  .timer-slide-body {
+    font-size: 26px; line-height: 1.45;
+    font-weight: 400;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 14px;
+  }
+  .timer-slide-body strong { font-weight: 600; color: var(--white); }
+  .timer-slide-tip {
+    font-size: 20px; line-height: 1.5;
+    color: rgba(255,255,255,0.78);
+    margin-top: 16px;
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  .timer-slide-tip strong {
+    flex-shrink: 0;
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 0.12em;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .timer-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 8px;
+  }
+  .timer-list li {
+    font-size: 28px;
+    line-height: 1.35;
+    color: rgba(255,255,255,0.92);
+    padding: 14px 0 14px 32px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .timer-list li:last-child { border-bottom: none; }
+  .timer-list li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 28px;
+    width: 10px;
+    height: 10px;
+    background: var(--yellow);
+    border-radius: 50%;
+  }
+  .timer-list li strong { font-weight: 600; color: var(--white); }
+
+  .timer-side {
+    display: flex; flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-width: 0;
+  }
+  .timer-display {
+    font-size: 168px; line-height: 0.9;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.045em;
+    color: var(--yellow);
+    margin: 0 0 24px;
+    font-family: var(--font-sans);
+    width: 100%;
+    text-align: center;
+  }
+  .timer-slide-split.warning .timer-display,
+  .timer-slide-split.done .timer-display { color: var(--white); }
+  .timer-controls {
+    display: flex; gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .tc-btn {
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 60px;
+    font-family: var(--font-sans); font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tc-btn:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); }
+  .tc-btn.primary {
+    background: var(--yellow); color: var(--black);
+    font-weight: 600;
+  }
+  .tc-btn.primary:hover { background: var(--white); }
+
+  /* topics list in slide 9 */
+  .topics-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 36px;
+    margin-top: 24px;
+  }
+  .topic-item {
+    display: flex; gap: 14px;
+    align-items: baseline;
+    font-size: 24px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.25;
+  }
+  .topic-item .topic-emoji-inline {
+    font-size: 28px;
+    flex-shrink: 0;
+    width: 36px;
+  }
+  .topic-item .topic-name-inline {
+    font-weight: 600;
+    color: var(--white);
+  }
+  .topic-item.recommended {
+    color: var(--yellow);
+  }
+  .topic-item.recommended .topic-name-inline { color: var(--yellow); }
+
+  /* dark variant of the analysis grid for Hunt the fake slide */
+  .analysis-grid.dark {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .analysis-grid.dark .analysis-row-simple {
+    gap: 16px;
+  }
+  .analysis-grid.dark .analysis-row-simple .from {
+    background: var(--yellow);
+    color: var(--black);
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    font-size: 30px;
+  }
+  .analysis-grid.dark .analysis-row-simple .arrow {
+    color: rgba(255,255,255,0.7);
+    font-size: 22px;
+  }
+  .analysis-grid.dark .analysis-row-simple .to span {
+    background: rgba(255, 236, 66, 0.18);
+    color: var(--yellow);
+    width: 44px;
+    height: 44px;
+    border-radius: 7px;
+    font-size: 26px;
+    border: 1.5px solid rgba(255, 236, 66, 0.5);
+  }
+
+  /* URL panel for slide 12 */
+  .url-display {
+    margin-top: 28px;
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: stretch;
+    max-width: 560px;
+  }
+  .url-display-label {
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--yellow);
+  }
+  .url-display-mockup {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  }
+  .url-display-bar {
+    background: var(--grey-100);
+    padding: 8px 12px;
+    display: flex; gap: 6px; align-items: center;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .url-display-bar-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .url-display-bar-dot.r { background: #FF5F57; }
+  .url-display-bar-dot.y { background: #FEBC2E; }
+  .url-display-bar-dot.g { background: #27C840; }
+  .url-display-content {
+    background: var(--white);
+    color: var(--black);
+    padding: 22px 28px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--black);
+  }
+  .url-display-content .scheme { color: var(--grey-700); font-weight: 400; }
+  .url-display-content .host { color: var(--black); }
+  .url-display-content .path { color: var(--blue); }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 13 — Break (centered)
+     ───────────────────────────────────────────────────────── */
+  .break-slide {
+    background: var(--black);
+    color: var(--white);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.4s ease;
+  }
+  .break-slide.warning { background: var(--red); }
+  .break-slide.done { background: var(--green); }
+  .break-slide .timer-phase { margin-bottom: 24px; }
+  .break-slide .break-title {
+    font-size: 96px; line-height: 1.04;
+    font-weight: 600; letter-spacing: -0.03em;
+    margin-bottom: 32px;
+  }
+  .break-slide .timer-display { margin-bottom: 32px; }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 16 — Presentation time (centered, no timer)
+     ───────────────────────────────────────────────────────── */
+  .stat-row {
+    display: flex; gap: 64px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-block {
+    display: flex; flex-direction: column;
+    gap: 4px;
+  }
+  .stat-value {
+    font-size: 88px; font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--black);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-size: 14px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 600;
+    color: var(--grey-500);
+  }
+  .reveal-body {
+    font-size: 28px;
+    line-height: 1.4;
+    color: rgba(10,10,10,0.78);
+    max-width: 1300px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+  .reveal-body strong { color: var(--black); font-weight: 600; }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 17 — Open mic (questions)
+     ───────────────────────────────────────────────────────── */
+  .questions {
+    margin-top: 16px;
+    max-width: 1500px;
+  }
+  .question {
+    display: flex; align-items: baseline; gap: 26px;
+    padding: 22px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 30px;
+    line-height: 1.4;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .question:last-child { border-bottom: none; }
+  .question-num {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--yellow);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    padding-top: 8px;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     SLIDE 18 — Closing (mirrors title)
+     ───────────────────────────────────────────────────────── */
+  .closing-eyebrow {
+    font-size: 14px; letter-spacing: 0.32em;
+    font-weight: 600; text-transform: uppercase;
+    color: var(--yellow);
+  }
+  .closing-workshop-title {
+    font-size: 36px;
+    line-height: 1.2;
+    font-weight: 500;
+    margin-top: 16px;
+    color: rgba(255,255,255,0.85);
+  }
+  .closing-thanks {
+    font-size: 200px;
+    line-height: 0.92;
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    color: var(--white);
+    margin: 32px 0;
+  }
+  .closing-thanks em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--yellow);
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     RESPONSIVE — prioritise 16:9 but stay sensible
+     ───────────────────────────────────────────────────────── */
+  @media (max-width: 1300px) {
+    :root { --pad-x: 60px; --pad-y-top: 56px; --pad-y-bot: 56px; }
+    .slide-title { font-size: 52px; }
+    .slide-title.medium { font-size: 44px; }
+    .slide-title.large { font-size: 76px; }
+    .slide-subtitle { font-size: 28px; }
+    .title-main { font-size: 120px; }
+    .title-meta { font-size: 30px; }
+    .timer-slide-title { font-size: 52px; }
+    .timer-slide-subtitle { font-size: 26px; }
+    .timer-slide-body { font-size: 22px; }
+    .timer-list li { font-size: 24px; padding: 12px 0 12px 28px; }
+    .timer-list li::before { top: 24px; }
+    .timer-display { font-size: 130px; }
+    .closing-thanks { font-size: 144px; }
+    .group-letter { font-size: 64px; }
+    .schema-name { font-size: 28px; }
+    .tm-cell .tm-name { font-size: 36px; }
+    .tm-cell.label { font-size: 26px; }
+    .tm-cell.label.row { font-size: 26px; }
+    .technique-name { font-size: 34px; }
+    .technique-desc { font-size: 20px; }
+    .technique-emoji { font-size: 48px; width: 64px; }
+    .topic-item { font-size: 19px; }
+    .analysis-row-simple .from { width: 64px; height: 64px; font-size: 38px; }
+    .analysis-row-simple .to span { width: 54px; height: 54px; font-size: 30px; }
+    .analysis-grid.dark .analysis-row-simple .from { width: 44px; height: 44px; font-size: 24px; }
+    .analysis-grid.dark .analysis-row-simple .to span { width: 36px; height: 36px; font-size: 22px; }
+    .stat-value { font-size: 64px; }
+    .reveal-body { font-size: 22px; }
+    .dds-logo { width: 260px; }
+  }
+  @media (max-width: 1000px) {
+    :root { --pad-x: 36px; --pad-y-top: 48px; --pad-y-bot: 40px; }
+    .slide-title { font-size: 40px; }
+    .title-main { font-size: 72px; }
+    .timer-slide-split { grid-template-columns: 1fr; gap: 24px; padding: 48px 36px; }
+    .timer-slide-title { font-size: 36px; }
+    .timer-display { font-size: 110px; }
+    .schema { grid-template-columns: 1fr; }
+    .schema-block { min-height: 80px; }
+    .schema-rail { display: none; }
+    .types-matrix { grid-template-columns: 1fr; grid-template-rows: auto; min-height: 0; }
+    .types-matrix .label { display: none; }
+    .techniques { grid-template-columns: 1fr; gap: 22px; }
+    .group-letters { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .group-letter { font-size: 48px; }
+    .topics-list { grid-template-columns: 1fr; }
+    .closing-thanks { font-size: 88px; }
+    .closing-bottom, .title-bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
+    .dds-logo { width: 160px; }
+    .stat-value { font-size: 48px; }
+    .analysis-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-height: 700px) {
+    :root { --pad-y-top: 48px; --pad-y-bot: 40px; }
+    .timer-display { font-size: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 1 · Title (animated bg, names left, logo right)        ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide title-slide active" data-name="Title">
+  <div class="animated-bg">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <g class="line l1">
+        <path d="M -200 320 Q 480 220 960 380 T 2120 280" />
+      </g>
+      <g class="line l2 accent">
+        <path d="M -200 540 Q 600 600 1200 480 T 2120 620" />
+      </g>
+      <g class="line l3">
+        <path d="M -200 760 Q 720 700 1320 820 T 2120 760" />
+      </g>
+      <g class="line l4">
+        <path d="M -200 200 Q 540 320 1080 200 T 2120 360" />
+      </g>
+      <g class="line l1">
+        <path d="M -200 880 Q 600 920 1200 860 T 2120 940" />
+      </g>
+    </svg>
+  </div>
+  <div>
+    <div class="title-eyebrow">Workshop</div>
+    <div class="title-emoji">📰&nbsp;🪞</div>
+    <h1 class="title-main">Can you<br><em>fake reality?</em></h1>
+    <p class="title-meta">10:45 → 13:30</p>
+  </div>
+  <div class="title-bottom">
+    <div class="title-names">Pau Aleikum and Bernat Saiz</div>
+    <svg class="dds-logo" viewBox="0 0 1390 60" xmlns="http://www.w3.org/2000/svg" aria-label="Domestic Data Streamers">
+      <path d="M.26 54.9V.63h18.12c14.89 0 27.92 8.6 27.92 27.14 0 18.46-13.03 27.15-27.92 27.15H.26Zm11.57-10.07h5.4c8.87 0 17.35-4.27 17.35-17.07S26.1 10.62 17.23 10.62h-5.4v34.2ZM94.43 55.53c-15.89 0-27.6-11.79-27.6-27.77C66.82 11.8 78.54 0 94.42 0c15.81 0 27.53 11.79 27.53 27.76 0 15.98-11.72 27.77-27.53 27.77Zm-.08-10.08c9.26 0 15.97-7.53 15.97-17.69S103.6 10 94.35 10c-9.25 0-15.88 7.6-15.88 17.76 0 10.16 6.63 17.69 15.88 17.69ZM144.8 54.9V.63h13.03l15.73 37.92L189.36.62h12.96v54.29h-10.8V21.79l-13.64 33.12h-8.56l-13.73-33.12v33.12h-10.8ZM227.6 54.9V.63h36.71v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9H227.6ZM305.78 55.53c-12.26 0-20.43-7.52-20.9-19.08h11.1c.47 5.5 4.1 9 9.8 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.5 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.8-7.06-4.54 0-7.4 2.18-7.4 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52ZM358.55 54.9V10.63h-15.97v-10h43.5v10h-15.96v44.29h-11.57ZM405.84 54.9V.63h11.65v54.29h-11.65ZM467.46 55.53c-14.65 0-27.06-9.46-27.06-27.77C440.4 9.46 453.04 0 467.46 0c13.58 0 23.53 7.76 24.99 19.47h-12.1c-.78-5.67-6.1-9.47-12.89-9.47-8.71 0-15.42 6.13-15.42 17.76 0 11.64 6.71 17.69 15.42 17.69 6.94 0 12.27-3.8 13.2-9.39h11.56c-1 11.64-10.95 19.47-24.76 19.47ZM546.2 54.9V.63h18.12c14.89 0 27.92 8.6 27.92 27.14 0 18.46-13.03 27.15-27.92 27.15H546.2Zm11.57-10.07h5.4c8.86 0 17.35-4.27 17.35-17.07s-8.49-17.14-17.35-17.14h-5.4v34.2ZM648.14 54.9l-4.24-11.86h-19.51l-4.24 11.87h-12.03L628.62.62h11.04l20.5 54.29h-12.02Zm-20.28-21.63h12.57l-6.25-17.6-6.32 17.6ZM685.28 54.9V10.63h-15.96v-10h43.49v10h-15.96v44.29h-11.57ZM762.02 54.9l-4.24-11.86h-19.51l-4.24 11.87H722L742.5.62h11.04l20.51 54.29h-12.03Zm-20.28-21.63h12.57l-6.25-17.6-6.32 17.6ZM843.93 55.53c-12.26 0-20.43-7.52-20.9-19.08h11.1c.47 5.5 4.1 9 9.8 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.5 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.8-7.06-4.54 0-7.4 2.18-7.4 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52ZM896.7 54.9V10.63h-15.96v-10h43.49v10h-15.96v44.29H896.7ZM984.32 39.94l1.47 14.97h-11.57l-1.46-13.42c-.39-3.72-3.01-6.28-6.63-6.28h-10.5v19.7H944V.62h22.75c11.5 0 18.2 7.14 18.2 17.06 0 5.43-2.62 9.15-6.79 11.33 3.48 2.4 5.71 6.2 6.17 10.93Zm-28.68-29.63v14.9h10.49c5.32 0 7.63-3.57 7.63-7.53 0-3.88-2.31-7.37-7.63-7.37h-10.5ZM1010.84 54.9V.63h36.7v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9h-37.55ZM1106.67 54.9l-4.24-11.86h-19.51l-4.24 11.87h-12.03L1087.16.62h11.03l20.51 54.29h-12.03Zm-20.28-21.63h12.57l-6.24-17.6-6.33 17.6ZM1139.33 54.9V.63h13.03l15.73 37.92L1183.9.62h12.96v54.29h-10.8V21.79l-13.65 33.12h-8.56l-13.73-33.12v33.12h-10.79ZM1222.14 54.9V.63h36.7v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9h-37.55ZM1322.91 39.94l1.47 14.97h-11.57l-1.47-13.42c-.38-3.72-3.01-6.28-6.63-6.28h-10.49v19.7h-11.64V.62h22.75c11.49 0 18.2 7.14 18.2 17.06 0 5.43-2.63 9.15-6.79 11.33 3.47 2.4 5.71 6.2 6.17 10.93Zm-28.69-29.63v14.9h10.49c5.32 0 7.63-3.57 7.63-7.53 0-3.88-2.31-7.37-7.63-7.37h-10.49ZM1365.2 55.53c-12.26 0-20.44-7.52-20.9-19.08h11.11c.46 5.5 4.08 9 9.79 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.51 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.79-7.06-4.55 0-7.41 2.18-7.41 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52Z"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 2 · Schedule                                           ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="Schedule">
+  <h1 class="slide-title">Schedule</h1>
+  <div class="schema">
+    <div class="schema-block intro">
+      <div class="schema-name">Concepts<br>&amp; method</div>
+      <div>
+        <div class="schema-time">10:45 → 11:15</div>
+        <div class="schema-duration">30 min</div>
+      </div>
+    </div>
+    <div class="schema-block build">
+      <div class="schema-name">Build<br>your feed</div>
+      <div>
+        <div class="schema-time">11:15 → 12:15</div>
+        <div class="schema-duration">60 min · 4 phases</div>
+      </div>
+    </div>
+    <div class="schema-block brk">
+      <div class="schema-name">Break</div>
+      <div>
+        <div class="schema-time">12:15 → 12:25</div>
+        <div class="schema-duration">10 min</div>
+      </div>
+    </div>
+    <div class="schema-block detect">
+      <div class="schema-name">Hunt<br>the fake</div>
+      <div>
+        <div class="schema-time">12:25 → 12:50</div>
+        <div class="schema-duration">25 min</div>
+      </div>
+    </div>
+    <div class="schema-block reveal">
+      <div class="schema-name">Reveal<br>&amp; reflect</div>
+      <div>
+        <div class="schema-time">12:50 → 13:30</div>
+        <div class="schema-duration">40 min</div>
+      </div>
+    </div>
+  </div>
+  <div class="schema-rail">
+    <span>10:45</span><span>11:30</span><span>12:00</span><span>12:30</span><span>13:00</span><span>13:30</span>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 3 · Concept review                                     ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="Concept review">
+  <h1 class="slide-title">Concept review</h1>
+  <div class="types-matrix">
+    <div class="tm-cell empty"></div>
+    <div class="tm-cell label">Truthful</div>
+    <div class="tm-cell label">False</div>
+
+    <div class="tm-cell label row">No deceptive<br>intent</div>
+    <div class="tm-cell"><div class="tm-name muted">Regular reporting</div></div>
+    <div class="tm-cell"><div class="tm-name">Misinformation</div></div>
+
+    <div class="tm-cell label row">Deceptive<br>intent</div>
+    <div class="tm-cell"><div class="tm-name">Malinformation</div></div>
+    <div class="tm-cell dis">
+      <div class="tm-name">Disinformation</div>
+      <span class="today-pill">Today</span>
+    </div>
+  </div>
+  <p class="types-note"><strong>Propaganda</strong> sits on a separate axis: communication biased to advance a cause, regardless of accuracy.</p>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 4 · Six manipulation techniques                        ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="Six manipulation techniques">
+  <h1 class="slide-title">Six manipulation techniques</h1>
+  <div class="techniques">
+    <div class="technique">
+      <div class="technique-emoji">🍒</div>
+      <div>
+        <div class="technique-name">Cherry-picking</div>
+        <p class="technique-desc">Keep only the data or quotes that fit your story.</p>
+      </div>
+    </div>
+    <div class="technique">
+      <div class="technique-emoji">📈</div>
+      <div>
+        <div class="technique-name">Chart axis manipulation</div>
+        <p class="technique-desc">Change the Y-axis so the trend looks bigger or smaller than it is.</p>
+      </div>
+    </div>
+    <div class="technique">
+      <div class="technique-emoji">🖼️</div>
+      <div>
+        <div class="technique-name">Image recontextualisation</div>
+        <p class="technique-desc">Use a real photo from somewhere else entirely.</p>
+      </div>
+    </div>
+    <div class="technique">
+      <div class="technique-emoji">✂️</div>
+      <div>
+        <div class="technique-name">Quote mining</div>
+        <p class="technique-desc">Crop a real statement so it means the opposite.</p>
+      </div>
+    </div>
+    <div class="technique">
+      <div class="technique-emoji">🎓</div>
+      <div>
+        <div class="technique-name">Manufactured authority</div>
+        <p class="technique-desc">Put words in the mouth of someone credible.</p>
+      </div>
+    </div>
+    <div class="technique">
+      <div class="technique-emoji">⚖️</div>
+      <div>
+        <div class="technique-name">Loaded language</div>
+        <p class="technique-desc">"Claims" vs "admits", "regime" vs "government". Words that bias the read.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 5 · Divide in groups (yellow, individual letter boxes) ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide bg-yellow" data-name="Divide in groups">
+  <h1 class="slide-title">Divide in groups</h1>
+  <div class="group-letters">
+    <span class="group-letter">A</span>
+    <span class="group-letter">B</span>
+    <span class="group-letter">C</span>
+    <span class="group-letter">D</span>
+    <span class="group-letter">E</span>
+    <span class="group-letter">F</span>
+    <span class="group-letter">G</span>
+    <span class="group-letter">H</span>
+    <span class="group-letter">I</span>
+    <span class="group-letter">J</span>
+  </div>
+  <p class="group-instruction">Make a paper sign with your letter, as large as you can.</p>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 6 · The master deck (iframe)                           ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="The master deck">
+  <h1 class="slide-title">The master deck</h1>
+  <div class="iframe-host">
+    <div class="iframe-bar">
+      <span class="iframe-bar-dot r"></span>
+      <span class="iframe-bar-dot y"></span>
+      <span class="iframe-bar-dot g"></span>
+      <span class="iframe-bar-url">docs.google.com/presentation/d/1DGMYorC8I3dLsaE6k35XsDgpB8by2k6FGzFe-38lQfI</span>
+    </div>
+    <iframe
+      src="https://docs.google.com/presentation/d/1DGMYorC8I3dLsaE6k35XsDgpB8by2k6FGzFe-38lQfI/embed?start=false&loop=false&delayms=3000"
+      allowfullscreen
+      mozallowfullscreen="true"
+      webkitallowfullscreen="true"></iframe>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 7 · Who analyses who                                   ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="Who analyses who">
+  <h1 class="slide-title">Who analyses who</h1>
+  <div class="analysis-grid">
+    <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>F</span><span>H</span></div></div>
+    <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>G</span><span>I</span></div></div>
+    <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>H</span><span>J</span></div></div>
+    <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>I</span><span>A</span></div></div>
+    <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>J</span><span>B</span></div></div>
+    <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>A</span><span>C</span></div></div>
+    <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>B</span><span>D</span></div></div>
+    <div class="analysis-row-simple"><div class="from">H</div><span class="arrow">→</span><div class="to"><span>C</span><span>E</span></div></div>
+    <div class="analysis-row-simple"><div class="from">I</div><span class="arrow">→</span><div class="to"><span>D</span><span>F</span></div></div>
+    <div class="analysis-row-simple"><div class="from">J</div><span class="arrow">→</span><div class="to"><span>E</span><span>G</span></div></div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 8 · Inspect Element (browser mockup + context menu)    ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide" data-name="Inspect Element">
+  <h1 class="slide-title">Inspect Element</h1>
+  <p class="slide-subtitle">The browser tool that lets you change anything on a webpage, locally.</p>
+  <div class="iframe-host">
+    <div class="iframe-bar">
+      <span class="iframe-bar-dot r"></span>
+      <span class="iframe-bar-dot y"></span>
+      <span class="iframe-bar-dot g"></span>
+      <span class="iframe-bar-url">www.dailyobserver.com/world/europe-summit</span>
+    </div>
+    <svg class="mockup-body" viewBox="0 0 1600 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="1600" height="720" fill="#FAFAF7"/>
+
+      <!-- masthead -->
+      <text x="60" y="80" font-family="Georgia, serif" font-size="40" font-weight="700" fill="#0a0a0a" letter-spacing="-1">The Daily Observer</text>
+      <line x1="60" y1="100" x2="1540" y2="100" stroke="#DAD7CB" stroke-width="1"/>
+      <text x="60" y="128" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#88857A" letter-spacing="2">WORLD · POLITICS · ECONOMY · OPINION</text>
+
+      <!-- headline -->
+      <text x="60" y="200" font-family="Georgia, serif" font-size="46" font-weight="700" fill="#0a0a0a" letter-spacing="-0.5">European leaders strike landmark</text>
+      <text x="60" y="250" font-family="Georgia, serif" font-size="46" font-weight="700" fill="#0a0a0a" letter-spacing="-0.5">climate deal at Brussels summit</text>
+      <text x="60" y="284" font-family="-apple-system, sans-serif" font-size="13" fill="#88857A">By Marie Laurent · 3 hours ago</text>
+
+      <!-- body paragraphs -->
+      <text x="60" y="344" font-family="Georgia, serif" font-size="18" fill="#4A4842">European Union leaders concluded a two-day summit in Brussels with a</text>
+      <text x="60" y="372" font-family="Georgia, serif" font-size="18" fill="#4A4842">commitment to a new framework for climate adaptation funding, marking</text>
+      <text x="60" y="400" font-family="Georgia, serif" font-size="18" fill="#4A4842">the most ambitious agreement in the bloc's recent history.</text>
+      <text x="60" y="456" font-family="Georgia, serif" font-size="18" fill="#4A4842">The deal, signed unanimously by the 27 member states, includes a phased</text>
+      <text x="60" y="484" font-family="Georgia, serif" font-size="18" fill="#4A4842">timeline of investment over the next decade and a shared mechanism for</text>
+      <text x="60" y="512" font-family="Georgia, serif" font-size="18" fill="#4A4842">monitoring progress across regions.</text>
+
+      <!-- right column placeholder image -->
+      <rect x="940" y="140" width="600" height="320" rx="4" fill="#DAD7CB"/>
+      <text x="1240" y="310" font-family="-apple-system, sans-serif" font-size="14" fill="#88857A" text-anchor="middle" font-style="italic">[ press conference photo ]</text>
+      <text x="940" y="488" font-family="-apple-system, sans-serif" font-size="12" fill="#88857A">Photo: European Council / Brussels, 2025</text>
+
+      <!-- selection highlight on headline -->
+      <rect x="48" y="220" width="600" height="40" fill="rgba(37, 99, 235, 0.18)" stroke="rgba(37, 99, 235, 0.6)" stroke-width="1.5" rx="2"/>
+
+      <!-- context menu -->
+      <g transform="translate(620, 240)">
+        <rect x="0" y="0" width="260" height="290" rx="8" fill="#FAFAF7" stroke="#BFBCAE" stroke-width="1"/>
+        <rect x="1" y="1" width="258" height="288" rx="7" fill="none" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+        <text x="20" y="32" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Back</text>
+        <text x="20" y="60" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Forward</text>
+        <text x="20" y="88" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Reload</text>
+        <line x1="14" y1="106" x2="246" y2="106" stroke="#DAD7CB" stroke-width="1"/>
+        <text x="20" y="130" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">View page source</text>
+        <text x="20" y="158" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Save as…</text>
+        <text x="20" y="186" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Print…</text>
+        <line x1="14" y1="204" x2="246" y2="204" stroke="#DAD7CB" stroke-width="1"/>
+
+        <!-- highlighted Inspect Element -->
+        <rect x="6" y="218" width="248" height="36" rx="5" fill="#FFEC42"/>
+        <text x="20" y="241" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#0a0a0a">Inspect Element</text>
+        <text x="208" y="241" font-family="ui-monospace, monospace" font-size="11" fill="#4A4842">⌘⇧I</text>
+
+        <text x="20" y="276" font-family="-apple-system, sans-serif" font-size="14" fill="#0a0a0a">Translate</text>
+      </g>
+
+      <!-- cursor ON TOP of highlighted Inspect Element row (menu at 620,240; row at y 218–254 inside; abs y 458–494) -->
+      <g transform="translate(720, 472)">
+        <path d="M 0 0 L 0 22 L 6 17 L 10 25 L 14 23 L 10 15 L 18 15 Z" fill="#FAFAF7" stroke="#0a0a0a" stroke-width="1.4" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 9 · Let's start! / Choose a topic (timer 10:00)        ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Let's start!" data-timer="600">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Phase 1 of 4 · Setup</div>
+    <h1 class="timer-slide-title">Let's start!</h1>
+    <p class="timer-slide-subtitle">Choose a topic.</p>
+    <div class="topics-list">
+      <div class="topic-item recommended">
+        <span class="topic-emoji-inline">🌍</span>
+        <span><span class="topic-name-inline">Climate crisis</span> · recommended</span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">💉</span>
+        <span><span class="topic-name-inline">Public health</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">🤖</span>
+        <span><span class="topic-name-inline">Tech &amp; AI</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">🏠</span>
+        <span><span class="topic-name-inline">Economy &amp; housing</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">🛂</span>
+        <span><span class="topic-name-inline">Migration</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">⚽</span>
+        <span><span class="topic-name-inline">Sports</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">🎬</span>
+        <span><span class="topic-name-inline">Culture &amp; celebrity</span></span>
+      </div>
+      <div class="topic-item">
+        <span class="topic-emoji-inline">🗳️</span>
+        <span><span class="topic-name-inline">Politics</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>10:00</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 10 · Find four real news articles (timer 15:00)        ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Find four real news articles" data-timer="900">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Phase 2 of 4 · Capture</div>
+    <h1 class="timer-slide-title">Find four real news articles.</h1>
+    <ul class="timer-list">
+      <li>One article per slide</li>
+      <li>Headline, photo, paragraph, chart — or any combination</li>
+      <li>Create a shared <strong>Google Slides</strong> with your team</li>
+    </ul>
+    <p class="timer-slide-tip"><strong>Tip</strong><span>Trusted outlets: Guardian, BBC, NYT, El País, Reuters.</span></p>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>15:00</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 11 · Construct your fake (timer 25:00)                 ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Construct your fake" data-timer="1500">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Phase 3 of 4 · Fabricate</div>
+    <h1 class="timer-slide-title">Construct your fake.</h1>
+    <ul class="timer-list">
+      <li>Same elements as the real ones</li>
+      <li>Use <strong>Inspect Element</strong> on a real article</li>
+      <li>Write the content yourselves or with AI</li>
+    </ul>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>25:00</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 12 · Submit your work (timer 5:00, with URL)           ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Submit your work" data-timer="300">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Phase 4 of 4 · Submit</div>
+    <h1 class="timer-slide-title">Submit your feed.</h1>
+    <p class="timer-slide-body">Put the content of each slide of your group into the master deck.</p>
+    <div class="url-display">
+      <div class="url-display-label">Go to</div>
+      <div class="url-display-mockup">
+        <div class="url-display-bar">
+          <span class="url-display-bar-dot r"></span>
+          <span class="url-display-bar-dot y"></span>
+          <span class="url-display-bar-dot g"></span>
+        </div>
+        <div class="url-display-content">
+          <span class="scheme">https://</span><span class="host">ja.cat</span><span class="path">/workshop-dds</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>05:00</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 13 · Break (centered, timer 10:00)                     ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide break-slide" data-name="Break" data-timer="600">
+  <div class="timer-phase">Break</div>
+  <h1 class="break-title">Coffee. Back when this hits zero.</h1>
+  <div class="timer-display" data-display>10:00</div>
+  <div class="timer-controls">
+    <button class="tc-btn primary" data-action="start">▶ Start</button>
+    <button class="tc-btn" data-action="pause">Pause</button>
+    <button class="tc-btn" data-action="reset">Reset</button>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 14 · Hunt the fake (timer 25:00 + assignment table)    ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Hunt the fake" data-timer="1500">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Phase 5 · Detection</div>
+    <h1 class="timer-slide-title">Hunt the fake.</h1>
+    <p class="timer-slide-body">Read all 5 articles in each feed and place the verdict sticker.</p>
+    <div class="analysis-grid dark" style="grid-template-columns: repeat(2, 1fr); gap: 6px 36px;">
+      <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>F</span><span>H</span></div></div>
+      <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>G</span><span>I</span></div></div>
+      <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>H</span><span>J</span></div></div>
+      <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>I</span><span>A</span></div></div>
+      <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>J</span><span>B</span></div></div>
+      <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>A</span><span>C</span></div></div>
+      <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>B</span><span>D</span></div></div>
+      <div class="analysis-row-simple"><div class="from">H</div><span class="arrow">→</span><div class="to"><span>C</span><span>E</span></div></div>
+      <div class="analysis-row-simple"><div class="from">I</div><span class="arrow">→</span><div class="to"><span>D</span><span>F</span></div></div>
+      <div class="analysis-row-simple"><div class="from">J</div><span class="arrow">→</span><div class="to"><span>E</span><span>G</span></div></div>
+    </div>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>25:00</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 15 · Presentation time (with 90s countdown per group)  ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide timer-slide-split" data-name="Presentation time" data-timer="90">
+  <div class="timer-slide-content">
+    <div class="timer-phase">Reveal · 90 sec per group</div>
+    <h1 class="timer-slide-title">Presentation time.</h1>
+    <p class="timer-slide-body">Choose a <strong>spokesperson</strong> to take the stand and make the case for your group's decision.</p>
+  </div>
+  <div class="timer-side">
+    <div class="timer-display" data-display>01:30</div>
+    <div class="timer-controls">
+      <button class="tc-btn primary" data-action="start">▶ Start</button>
+      <button class="tc-btn" data-action="pause">Pause</button>
+      <button class="tc-btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 16 · Open mic                                          ║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide bg-black" data-name="Open mic">
+  <h1 class="slide-title">Open mic</h1>
+  <div class="questions">
+    <div class="question"><span class="question-num">01</span><span>Which trick fooled you the most, and why?</span></div>
+    <div class="question"><span class="question-num">02</span><span>What's the AI fingerprint when you can spot it? What makes it disappear?</span></div>
+    <div class="question"><span class="question-num">03</span><span>Did some real feeds feel fake to you? What was that feeling made of?</span></div>
+    <div class="question"><span class="question-num">04</span><span>Did the Inspect Element shells make detection harder than you expected?</span></div>
+    <div class="question"><span class="question-num">05</span><span>What does this morning change about how you read what you read online?</span></div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════════════════════════════╗
+     ║  SLIDE 17 · Closing (mirrors title, animated bg, big "thanks")║
+     ╚═══════════════════════════════════════════════════════════════╝ -->
+<section class="slide closing-slide" data-name="Closing">
+  <div class="animated-bg">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <g class="line l1"><path d="M -200 320 Q 480 220 960 380 T 2120 280" /></g>
+      <g class="line l2 accent"><path d="M -200 540 Q 600 600 1200 480 T 2120 620" /></g>
+      <g class="line l3"><path d="M -200 760 Q 720 700 1320 820 T 2120 760" /></g>
+      <g class="line l4"><path d="M -200 200 Q 540 320 1080 200 T 2120 360" /></g>
+      <g class="line l1"><path d="M -200 880 Q 600 920 1200 860 T 2120 940" /></g>
+    </svg>
+  </div>
+  <div>
+    <div class="closing-eyebrow">Can you fake reality?</div>
+    <p class="closing-workshop-title">A workshop on disinformation</p>
+    <h2 class="closing-thanks"><em>Thank you.</em></h2>
+  </div>
+  <div class="closing-bottom">
+    <div class="title-names">Pau Aleikum and Bernat Saiz</div>
+    <svg class="dds-logo" viewBox="0 0 1390 60" xmlns="http://www.w3.org/2000/svg" aria-label="Domestic Data Streamers">
+      <path d="M.26 54.9V.63h18.12c14.89 0 27.92 8.6 27.92 27.14 0 18.46-13.03 27.15-27.92 27.15H.26Zm11.57-10.07h5.4c8.87 0 17.35-4.27 17.35-17.07S26.1 10.62 17.23 10.62h-5.4v34.2ZM94.43 55.53c-15.89 0-27.6-11.79-27.6-27.77C66.82 11.8 78.54 0 94.42 0c15.81 0 27.53 11.79 27.53 27.76 0 15.98-11.72 27.77-27.53 27.77Zm-.08-10.08c9.26 0 15.97-7.53 15.97-17.69S103.6 10 94.35 10c-9.25 0-15.88 7.6-15.88 17.76 0 10.16 6.63 17.69 15.88 17.69ZM144.8 54.9V.63h13.03l15.73 37.92L189.36.62h12.96v54.29h-10.8V21.79l-13.64 33.12h-8.56l-13.73-33.12v33.12h-10.8ZM227.6 54.9V.63h36.71v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9H227.6ZM305.78 55.53c-12.26 0-20.43-7.52-20.9-19.08h11.1c.47 5.5 4.1 9 9.8 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.5 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.8-7.06-4.54 0-7.4 2.18-7.4 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52ZM358.55 54.9V10.63h-15.97v-10h43.5v10h-15.96v44.29h-11.57ZM405.84 54.9V.63h11.65v54.29h-11.65ZM467.46 55.53c-14.65 0-27.06-9.46-27.06-27.77C440.4 9.46 453.04 0 467.46 0c13.58 0 23.53 7.76 24.99 19.47h-12.1c-.78-5.67-6.1-9.47-12.89-9.47-8.71 0-15.42 6.13-15.42 17.76 0 11.64 6.71 17.69 15.42 17.69 6.94 0 12.27-3.8 13.2-9.39h11.56c-1 11.64-10.95 19.47-24.76 19.47ZM546.2 54.9V.63h18.12c14.89 0 27.92 8.6 27.92 27.14 0 18.46-13.03 27.15-27.92 27.15H546.2Zm11.57-10.07h5.4c8.86 0 17.35-4.27 17.35-17.07s-8.49-17.14-17.35-17.14h-5.4v34.2ZM648.14 54.9l-4.24-11.86h-19.51l-4.24 11.87h-12.03L628.62.62h11.04l20.5 54.29h-12.02Zm-20.28-21.63h12.57l-6.25-17.6-6.32 17.6ZM685.28 54.9V10.63h-15.96v-10h43.49v10h-15.96v44.29h-11.57ZM762.02 54.9l-4.24-11.86h-19.51l-4.24 11.87H722L742.5.62h11.04l20.51 54.29h-12.03Zm-20.28-21.63h12.57l-6.25-17.6-6.32 17.6ZM843.93 55.53c-12.26 0-20.43-7.52-20.9-19.08h11.1c.47 5.5 4.1 9 9.8 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.5 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.8-7.06-4.54 0-7.4 2.18-7.4 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52ZM896.7 54.9V10.63h-15.96v-10h43.49v10h-15.96v44.29H896.7ZM984.32 39.94l1.47 14.97h-11.57l-1.46-13.42c-.39-3.72-3.01-6.28-6.63-6.28h-10.5v19.7H944V.62h22.75c11.5 0 18.2 7.14 18.2 17.06 0 5.43-2.62 9.15-6.79 11.33 3.48 2.4 5.71 6.2 6.17 10.93Zm-28.68-29.63v14.9h10.49c5.32 0 7.63-3.57 7.63-7.53 0-3.88-2.31-7.37-7.63-7.37h-10.5ZM1010.84 54.9V.63h36.7v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9h-37.55ZM1106.67 54.9l-4.24-11.86h-19.51l-4.24 11.87h-12.03L1087.16.62h11.03l20.51 54.29h-12.03Zm-20.28-21.63h12.57l-6.24-17.6-6.33 17.6ZM1139.33 54.9V.63h13.03l15.73 37.92L1183.9.62h12.96v54.29h-10.8V21.79l-13.65 33.12h-8.56l-13.73-33.12v33.12h-10.79ZM1222.14 54.9V.63h36.7v10h-25.14V22.1h20.05V32.2h-20.05v12.64h25.99V54.9h-37.55ZM1322.91 39.94l1.47 14.97h-11.57l-1.47-13.42c-.38-3.72-3.01-6.28-6.63-6.28h-10.49v19.7h-11.64V.62h22.75c11.49 0 18.2 7.14 18.2 17.06 0 5.43-2.63 9.15-6.79 11.33 3.47 2.4 5.71 6.2 6.17 10.93Zm-28.69-29.63v14.9h10.49c5.32 0 7.63-3.57 7.63-7.53 0-3.88-2.31-7.37-7.63-7.37h-10.49ZM1365.2 55.53c-12.26 0-20.44-7.52-20.9-19.08h11.11c.46 5.5 4.08 9 9.79 9 5.17 0 8.64-2.17 8.64-6.29 0-10.62-28-2.48-28-23.8 0-9 7.72-15.36 18.67-15.36 11.64 0 19.51 6.75 19.82 17.06h-11.03c-.39-4.26-3.63-7.06-8.79-7.06-4.55 0-7.41 2.18-7.41 5.36 0 11.32 28.38 2.17 28.38 23.65 0 10.16-8.17 16.52-20.28 16.52Z"/>
+    </svg>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let current = 0;
+  const timerState = {};
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmtTime(s) {
+    if (s < 0) s = 0;
+    return pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+  }
+
+  function isDarkSlide(slide) {
+    return slide.classList.contains('bg-black')
+      || slide.classList.contains('timer-slide-split')
+      || slide.classList.contains('break-slide')
+      || slide.classList.contains('title-slide')
+      || slide.classList.contains('closing-slide');
+  }
+
+  function updateBodyTheme(slide) {
+    document.body.classList.toggle('dark', isDarkSlide(slide));
+  }
+
+  function show(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= total) idx = total - 1;
+    if (idx === current && slides[idx].classList.contains('active')) return;
+
+    if (timerState[current] && timerState[current].interval) {
+      clearInterval(timerState[current].interval);
+      timerState[current].interval = null;
+      timerState[current].running = false;
+    }
+
+    slides[current].classList.remove('active');
+    current = idx;
+    slides[current].classList.add('active');
+
+    updateBodyTheme(slides[current]);
+    initTimerIfPresent(slides[current]);
+
+    if (history.replaceState) {
+      history.replaceState(null, '', '#slide-' + (current + 1));
+    }
+  }
+
+  function initTimerIfPresent(slide) {
+    const timerSeconds = parseInt(slide.dataset.timer, 10);
+    if (!timerSeconds) return;
+
+    const idx = slides.indexOf(slide);
+    const display = slide.querySelector('[data-display]');
+    if (!timerState[idx]) {
+      timerState[idx] = {
+        total: timerSeconds,
+        remaining: timerSeconds,
+        interval: null,
+        running: false
+      };
+    }
+    display.textContent = fmtTime(timerState[idx].remaining);
+    updateTimerColor(slide, timerState[idx].remaining, timerState[idx].total);
+
+    const startBtn = slide.querySelector('[data-action="start"]');
+    const pauseBtn = slide.querySelector('[data-action="pause"]');
+    const resetBtn = slide.querySelector('[data-action="reset"]');
+
+    if (startBtn && !startBtn._bound) {
+      startBtn.addEventListener('click', () => startTimer(idx));
+      pauseBtn.addEventListener('click', () => pauseTimer(idx));
+      resetBtn.addEventListener('click', () => resetTimer(idx));
+      startBtn._bound = pauseBtn._bound = resetBtn._bound = true;
+    }
+  }
+
+  function updateTimerColor(slide, remaining, total) {
+    slide.classList.remove('warning', 'done');
+    if (remaining <= 0) {
+      slide.classList.add('done');
+    } else if (remaining <= Math.min(60, total * 0.15)) {
+      slide.classList.add('warning');
+    }
+  }
+
+  function startTimer(idx) {
+    const state = timerState[idx];
+    if (!state || state.running) return;
+    state.running = true;
+    const slide = slides[idx];
+    const display = slide.querySelector('[data-display]');
+
+    state.interval = setInterval(() => {
+      state.remaining -= 1;
+      display.textContent = fmtTime(state.remaining);
+      updateTimerColor(slide, state.remaining, state.total);
+      if (state.remaining <= 0) {
+        clearInterval(state.interval);
+        state.interval = null;
+        state.running = false;
+        try { beep(); } catch (e) {}
+      }
+    }, 1000);
+  }
+
+  function pauseTimer(idx) {
+    const state = timerState[idx];
+    if (!state) return;
+    if (state.interval) {
+      clearInterval(state.interval);
+      state.interval = null;
+      state.running = false;
+    }
+  }
+
+  function resetTimer(idx) {
+    const state = timerState[idx];
+    if (!state) return;
+    pauseTimer(idx);
+    state.remaining = state.total;
+    const slide = slides[idx];
+    slide.querySelector('[data-display]').textContent = fmtTime(state.remaining);
+    slide.classList.remove('warning', 'done');
+  }
+
+  function beep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.25, 0.5].forEach(t => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.18);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.2);
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'IFRAME' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); show(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); show(current - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault(); show(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); show(total - 1);
+    } else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  });
+
+  function handleHash() {
+    const match = (location.hash || '').match(/^#slide-(\d+)$/);
+    if (match) {
+      const target = parseInt(match[1], 10) - 1;
+      if (target >= 0 && target < total) show(target);
+    }
+  }
+
+  // Init
+  initTimerIfPresent(slides[0]);
+  updateBodyTheme(slides[0]);
+  handleHash();
+})();
+</script>
+
+</body>
+</html>
