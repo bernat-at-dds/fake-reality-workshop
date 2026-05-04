@@ -385,22 +385,45 @@
   /* ─────────────────────────────────────────────────────────
      SLIDE 5 — Divide in groups (yellow, individual letter boxes)
      ───────────────────────────────────────────────────────── */
-  .group-letters {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 12px;
+  .group-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     width: 100%;
-    margin: 32px 0 32px;
+    margin: 24px 0 24px;
+    flex: 1;
+    justify-content: center;
+  }
+  .group-row {
+    display: flex;
+    align-items: center;
+    gap: 28px;
   }
   .group-letter {
-    aspect-ratio: 1 / 1.1;
     background: var(--black);
     color: var(--yellow);
-    border-radius: 14px;
+    border-radius: 12px;
+    width: 88px;
+    height: 88px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 88px;
+    font-size: 64px;
     font-weight: 600;
     letter-spacing: -0.04em;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .group-equals {
+    font-size: 56px;
+    font-weight: 400;
+    color: var(--black);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .group-name {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--black);
     line-height: 1;
   }
   .group-instruction {
@@ -408,6 +431,10 @@
     color: rgba(10,10,10,0.85);
     max-width: 1200px;
     font-weight: 500;
+  }
+  .group-instruction strong {
+    color: var(--black);
+    font-weight: 700;
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -890,7 +917,9 @@
     .timer-list li::before { top: 24px; }
     .timer-display { font-size: 130px; }
     .closing-thanks { font-size: 144px; }
-    .group-letter { font-size: 64px; }
+    .group-letter { width: 72px; height: 72px; font-size: 52px; }
+    .group-equals { font-size: 44px; }
+    .group-name { font-size: 44px; }
     .schema-name { font-size: 28px; }
     .tm-cell .tm-name { font-size: 36px; }
     .tm-cell.label { font-size: 26px; }
@@ -920,8 +949,10 @@
     .types-matrix { grid-template-columns: 1fr; grid-template-rows: auto; min-height: 0; }
     .types-matrix .label { display: none; }
     .techniques { grid-template-columns: 1fr; gap: 22px; }
-    .group-letters { grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .group-letter { font-size: 48px; }
+    .group-letter { width: 56px; height: 56px; font-size: 40px; }
+    .group-equals { font-size: 32px; }
+    .group-name { font-size: 32px; }
+    .group-row { gap: 16px; }
     .topics-list { grid-template-columns: 1fr; }
     .closing-thanks { font-size: 88px; }
     .closing-bottom, .title-bottom { flex-direction: column; align-items: flex-start; gap: 24px; }
@@ -1103,19 +1134,16 @@
      ╚═══════════════════════════════════════════════════════════════╝ -->
 <section class="slide bg-yellow" data-name="Divide in groups">
   <h1 class="slide-title">Divide in groups</h1>
-  <div class="group-letters">
-    <span class="group-letter">A</span>
-    <span class="group-letter">B</span>
-    <span class="group-letter">C</span>
-    <span class="group-letter">D</span>
-    <span class="group-letter">E</span>
-    <span class="group-letter">F</span>
-    <span class="group-letter">G</span>
-    <span class="group-letter">H</span>
-    <span class="group-letter">I</span>
-    <span class="group-letter">J</span>
+  <div class="group-rows">
+    <div class="group-row"><span class="group-letter">A</span><span class="group-equals">·</span><span class="group-name">Anonymous Sources Inc.</span></div>
+    <div class="group-row"><span class="group-letter">B</span><span class="group-equals">·</span><span class="group-name">Bot Farm Co.</span></div>
+    <div class="group-row"><span class="group-letter">C</span><span class="group-equals">·</span><span class="group-name">Concerned Citizens</span></div>
+    <div class="group-row"><span class="group-letter">D</span><span class="group-equals">·</span><span class="group-name">Daily Truth</span></div>
+    <div class="group-row"><span class="group-letter">E</span><span class="group-equals">·</span><span class="group-name">Experts United</span></div>
+    <div class="group-row"><span class="group-letter">F</span><span class="group-equals">·</span><span class="group-name">Family Foundation</span></div>
+    <div class="group-row"><span class="group-letter">G</span><span class="group-equals">·</span><span class="group-name">Global Research Group</span></div>
   </div>
-  <p class="group-instruction">Make a paper sign with your letter, as large as you can.</p>
+  <p class="group-instruction">One university per group. Make a paper sign with your letter. For today, your group has a <strong>stage name</strong>.</p>
 </section>
 
 <!-- ╔═══════════════════════════════════════════════════════════════╗
@@ -1144,16 +1172,13 @@
 <section class="slide" data-name="Who analyses who">
   <h1 class="slide-title">Who analyses who</h1>
   <div class="analysis-grid">
-    <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>F</span><span>H</span></div></div>
-    <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>G</span><span>I</span></div></div>
-    <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>H</span><span>J</span></div></div>
-    <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>I</span><span>A</span></div></div>
-    <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>J</span><span>B</span></div></div>
-    <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>A</span><span>C</span></div></div>
-    <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>B</span><span>D</span></div></div>
-    <div class="analysis-row-simple"><div class="from">H</div><span class="arrow">→</span><div class="to"><span>C</span><span>E</span></div></div>
-    <div class="analysis-row-simple"><div class="from">I</div><span class="arrow">→</span><div class="to"><span>D</span><span>F</span></div></div>
-    <div class="analysis-row-simple"><div class="from">J</div><span class="arrow">→</span><div class="to"><span>E</span><span>G</span></div></div>
+    <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>B</span><span>C</span></div></div>
+    <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>C</span><span>D</span></div></div>
+    <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>D</span><span>E</span></div></div>
+    <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>E</span><span>F</span></div></div>
+    <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>F</span><span>G</span></div></div>
+    <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>G</span><span>A</span></div></div>
+    <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>A</span><span>B</span></div></div>
   </div>
 </section>
 
@@ -1289,9 +1314,9 @@
     <div class="timer-phase">Phase 2 of 4 · Capture</div>
     <h1 class="timer-slide-title">Find four real news articles.</h1>
     <ul class="timer-list">
-      <li>One article per slide</li>
-      <li>Headline, photo, paragraph, chart — or any combination</li>
-      <li>Create a shared <strong>Google Slides</strong> with your team</li>
+      <li>Create a <strong>shared Google Slides</strong> for your team</li>
+      <li>One article per slide — headline, photo, paragraph, chart, or any combination</li>
+      <li>You'll move everything into the master deck at the end</li>
     </ul>
     <p class="timer-slide-tip"><strong>Tip</strong><span>Trusted outlets: Guardian, BBC, NYT, El País, Reuters.</span></p>
   </div>
@@ -1382,17 +1407,14 @@
     <div class="timer-phase">Phase 5 · Detection</div>
     <h1 class="timer-slide-title">Hunt the fake.</h1>
     <p class="timer-slide-body">Read all 5 articles in each feed and place the verdict sticker.</p>
-    <div class="analysis-grid dark" style="grid-template-columns: repeat(2, 1fr); gap: 6px 36px;">
-      <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>F</span><span>H</span></div></div>
-      <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>G</span><span>I</span></div></div>
-      <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>H</span><span>J</span></div></div>
-      <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>I</span><span>A</span></div></div>
-      <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>J</span><span>B</span></div></div>
-      <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>A</span><span>C</span></div></div>
-      <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>B</span><span>D</span></div></div>
-      <div class="analysis-row-simple"><div class="from">H</div><span class="arrow">→</span><div class="to"><span>C</span><span>E</span></div></div>
-      <div class="analysis-row-simple"><div class="from">I</div><span class="arrow">→</span><div class="to"><span>D</span><span>F</span></div></div>
-      <div class="analysis-row-simple"><div class="from">J</div><span class="arrow">→</span><div class="to"><span>E</span><span>G</span></div></div>
+    <div class="analysis-grid dark" style="gap: 6px;">
+      <div class="analysis-row-simple"><div class="from">A</div><span class="arrow">→</span><div class="to"><span>B</span><span>C</span></div></div>
+      <div class="analysis-row-simple"><div class="from">B</div><span class="arrow">→</span><div class="to"><span>C</span><span>D</span></div></div>
+      <div class="analysis-row-simple"><div class="from">C</div><span class="arrow">→</span><div class="to"><span>D</span><span>E</span></div></div>
+      <div class="analysis-row-simple"><div class="from">D</div><span class="arrow">→</span><div class="to"><span>E</span><span>F</span></div></div>
+      <div class="analysis-row-simple"><div class="from">E</div><span class="arrow">→</span><div class="to"><span>F</span><span>G</span></div></div>
+      <div class="analysis-row-simple"><div class="from">F</div><span class="arrow">→</span><div class="to"><span>G</span><span>A</span></div></div>
+      <div class="analysis-row-simple"><div class="from">G</div><span class="arrow">→</span><div class="to"><span>A</span><span>B</span></div></div>
     </div>
   </div>
   <div class="timer-side">
@@ -1408,14 +1430,14 @@
 <!-- ╔═══════════════════════════════════════════════════════════════╗
      ║  SLIDE 15 · Presentation time (with 90s countdown per group)  ║
      ╚═══════════════════════════════════════════════════════════════╝ -->
-<section class="slide timer-slide-split" data-name="Presentation time" data-timer="90">
+<section class="slide timer-slide-split" data-name="Presentation time" data-timer="120">
   <div class="timer-slide-content">
-    <div class="timer-phase">Reveal · 90 sec per group</div>
+    <div class="timer-phase">Reveal · 2 min per group</div>
     <h1 class="timer-slide-title">Presentation time.</h1>
     <p class="timer-slide-body">Choose a <strong>spokesperson</strong> to take the stand and make the case for your group's decision.</p>
   </div>
   <div class="timer-side">
-    <div class="timer-display" data-display>01:30</div>
+    <div class="timer-display" data-display>02:00</div>
     <div class="timer-controls">
       <button class="tc-btn primary" data-action="start">▶ Start</button>
       <button class="tc-btn" data-action="pause">Pause</button>
